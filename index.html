@@ -347,9 +347,9 @@
             const row = body.insertRow();
             const hoy = new Date().toISOString().split('T')[0];
             row.innerHTML = `
-                <td><input type="date" value="${hoy}"></td>
-                <td><input type="text"></td>
-                <td><select>${cats.map(c => '<option>'+c+'</option>').join('')}</select></td>
+                <td><input type="date" value="${hoy}" onchange="calc('${tipo}')"></td>
+                <td><input type="text" onchange="calc('${tipo}')"></td>
+                <td><select onchange="calc('${tipo}')">${cats.map(c => '<option>'+c+'</option>').join('')}</select></td>
                 <td class="ingreso"><input type="number" step="0.01" value="0" onchange="calc('${tipo}')"></td>
                 <td class="egreso"><input type="number" step="0.01" value="0" onchange="calc('${tipo}')"></td>
                 <td class="saldo"><input type="number" readonly></td>
