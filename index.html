@@ -361,17 +361,23 @@
         function calc(tipo) {
             const body = document.getElementById(tipo === 'n' ? 'bodyNegocio' : 'bodyPersonal');
             const rows = body.getElementsByTagName('tr');
-            let saldo = 0;
+            let saldoAnterior = 0;
+            
             for (let i = 0; i < rows.length; i++) {
                 const inp = rows[i].getElementsByTagName('input');
                 const ing = parseFloat(inp[3].value) || 0;
                 const egr = parseFloat(inp[4].value) || 0;
+                
                 if (i === 0) {
-                    saldo = parseFloat(inp[5].value) || 0;
+                    // Primera fila: saldo inicial (editable)
+                    saldoAnterior = parseFloat(inp[5].value) || 0;
+                    inp[5].value = saldoAnterior.toFixed(2);
                 } else {
-                    saldo = saldo + ing - egr;
+                    // Filas siguientes: calcular saldo
+                    const saldoActual = saldoAnterior + ing - egr;
+                    inp[5].value = saldoActual.toFixed(2);
+                    saldoAnterior = saldoActual;
                 }
-                inp[5].value = saldo.toFixed(2);
             }
             tipo === 'n' ? filtrarNegocio() : filtrarPersonal();
         }
