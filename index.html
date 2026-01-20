@@ -582,29 +582,37 @@
             const body = document.getElementById(tipo === 'n' ? 'bodyNegocio' : 'bodyPersonal');
             const rows = body.getElementsByTagName('tr');
             
-            let csv = 'Fecha,Descripcion,Categoria,Ingreso,Egreso,Saldo\n';
+            // Crear CSV
+            let contenido = 'Fecha,Descripcion,Categoria,Ingreso,Egreso,Saldo\r\n';
             
             for (let i = 0; i < rows.length; i++) {
-                const inp = rows[i].getElementsByTagName('input');
-                const sel = rows[i].getElementsByTagName('select')[0];
-                const fecha = inp[0].value;
-                const desc = inp[1].value.replace(/,/g, ';');
-                const cat = sel.value.replace(/,/g, ';');
-                const ing = inp[3].value;
-                const egr = inp[4].value;
-                const saldo = inp[5].value;
-                csv += `${fecha},${desc},${cat},${ing},${egr},${saldo}\n`;
+                const inputs = rows[i].getElementsByTagName('input');
+                const select = rows[i].getElementsByTagName('select')[0];
+                
+                const fecha = inputs[0].value;
+                const desc = inputs[1].value.replace(/,/g, ' ');
+                const cat = select.value.replace(/,/g, ' ');
+                const ing = inputs[3].value;
+                const egr = inputs[4].value;
+                const saldo = inputs[5].value;
+                
+                contenido += `${fecha},${desc},${cat},${ing},${egr},${saldo}\r\n`;
             }
             
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', `Control_${nombre}_${new Date().toISOString().split('T')[0]}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // Crear y descargar
+            const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Control_${nombre}_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            alert('¡Archivo descargado! Busca: Control_' + nombre + '_' + new Date().toISOString().split('T')[0] + '.csv en tu carpeta de Descargas');
         }
 
         function exportarCSV(tipo) {
