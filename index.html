@@ -582,8 +582,18 @@
             const body = document.getElementById(tipo === 'n' ? 'bodyNegocio' : 'bodyPersonal');
             const rows = body.getElementsByTagName('tr');
             
-            // Crear texto tabulado para Excel
-            let contenido = 'Fecha\tDescripcion\tCategoria\tIngreso\tEgreso\tSaldo\n';
+            // Crear tabla HTML para mostrar
+            let html = '<html><head><title>Control ' + nombre + '</title>';
+            html += '<style>body{font-family:Arial;padding:20px;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ddd;padding:8px;text-align:left;} th{background:#34495e;color:white;} .copiar{background:#27ae60;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;margin:10px 0;font-size:16px;}</style>';
+            html += '</head><body>';
+            html += '<h2>Control de ' + nombre + '</h2>';
+            html += '<p><strong>Instrucciones:</strong></p>';
+            html += '<ol><li>Selecciona toda la tabla (haz clic y arrastra, o Cmd+A)</li><li>Copia (Cmd+C)</li><li>Pega en Excel o Numbers (Cmd+V)</li></ol>';
+            
+            // Crear contenido para copiar (formato tabulado)
+            let textoPlano = 'Fecha\tDescripcion\tCategoria\tIngreso\tEgreso\tSaldo\n';
+            
+            html += '<table><thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Ingreso</th><th>Egreso</th><th>Saldo</th></tr></thead><tbody>';
             
             for (let i = 0; i < rows.length; i++) {
                 const inputs = rows[i].getElementsByTagName('input');
@@ -596,18 +606,20 @@
                 const egr = inputs[4].value;
                 const saldo = inputs[5].value;
                 
-                contenido += `${fecha}\t${desc}\t${cat}\t${ing}\t${egr}\t${saldo}\n`;
+                html += `<tr><td>${fecha}</td><td>${desc}</td><td>${cat}</td><td>${ing}</td><td>${egr}</td><td>${saldo}</td></tr>`;
+                textoPlano += `${fecha}\t${desc}\t${cat}\t${ing}\t${egr}\t${saldo}\n`;
             }
             
-            // Copiar al portapapeles
-            navigator.clipboard.writeText(contenido).then(() => {
-                alert('✅ ¡Datos copiados!\n\n1. Abre Excel o Numbers\n2. Pega (Cmd+V)\n3. Los datos se pegarán en columnas\n\nTambién puedes pegar en Google Sheets');
-            }).catch(() => {
-                // Si falla el portapapeles, mostrar en ventana
-                const ventana = window.open('', '_blank');
-                ventana.document.write('<pre>' + contenido.replace(/\t/g, ',') + '</pre>');
-                ventana.document.write('<p>Selecciona todo (Cmd+A), copia (Cmd+C) y pega en Excel</p>');
-            });
+            html += '</tbody></table>';
+            html += '<br><h3>O copia este texto:</h3>';
+            html += '<textarea id="textoCSV" style="width:100%;height:200px;font-family:monospace;">' + textoPlano + '</textarea>';
+            html += '<br><button class="copiar" onclick="document.getElementById(\'textoCSV\').select();document.execCommand(\'copy\');alert(\'¡Copiado!\')">📋 Copiar Texto</button>';
+            html += '</body></html>';
+            
+            // Abrir en nueva ventana
+            const ventana = window.open('', '_blank');
+            ventana.document.write(html);
+            ventana.document.close();
         }
 
         function exportarExcel(tipo) {
@@ -645,7 +657,7 @@
             document.body.removeChild(a);
             
             setTimeout(() => {
-                alert('✅ Archivo descargado!\n\nBusca: ' + filename + '\n\nSi no se descargó, usa el botón "📋 Copiar Datos"');
+                alert('Si no se descargó automáticamente, usa el botón "📋 Copiar Datos" y pega en Excel');
             }, 500);
         }
 
